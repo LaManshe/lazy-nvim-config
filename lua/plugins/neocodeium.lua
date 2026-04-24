@@ -1,5 +1,5 @@
 return {
-    --[[{
+    {
         "monkoose/neocodeium",
         event = "VeryLazy",
         config = function()
@@ -7,5 +7,5 @@ return {
             neocodeium.setup()
             vim.keymap.set("i", "<S-Tab>", neocodeium.accept)
         end,
-    },]]
+    },
 }
