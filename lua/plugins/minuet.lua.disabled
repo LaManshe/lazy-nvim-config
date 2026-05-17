@@ -1,0 +1,61 @@
+return {
+    {
+        "milanglacier/minuet-ai.nvim",
+        event = "VeryLazy",
+        config = function()
+            require("minuet").setup({
+                provider = "openai_fim_compatible",
+                n_completions = 1,
+                context_window = 512,
+                provider_options = {
+                    openai_fim_compatible = {
+                        api_key = function()
+                            return "ollama"
+                        end,
+                        name = "Ollama",
+                        end_point = "http://localhost:11434/v1/completions",
+                        model = "qwen2.5-coder:7b",
+                        optional = {
+                            max_tokens = 56,
+                            top_p = 0.9,
+                        },
+                    },
+                },
+                virtualtext = {
+                    auto_trigger_ft = { "*" },
+                    keymap = {
+                        accept = "<S-Tab>",
+                        accept_line = "<A-l>",
+                        prev = "<A-[>",
+                        next = "<A-]>",
+                        dismiss = "<A-e>",
+                    },
+                },
+                request_timeout = 10,
+                throttle = 2000,
+                debounce = 500,
+                notify = "warn",
+            })
+
+            local minuet_spinner = vim.api.nvim_create_namespace("minuet_spinner")
+
+            vim.api.nvim_create_autocmd("User", {
+                pattern = "MinuetRequestStartedPre",
+                callback = function()
+                    vim.api.nvim_buf_set_extmark(0, minuet_spinner, vim.fn.line(".") - 1, 0, {
+                        virt_text = { { " minuet thinking...", "DiagnosticVirtualTextInfo" } },
+                        virt_text_pos = "eol",
+                        hl_mode = "combine",
+                    })
+                end,
+            })
+
+            vim.api.nvim_create_autocmd("User", {
+                pattern = "MinuetRequestFinished",
+                callback = function()
+                    vim.api.nvim_buf_clear_namespace(0, minuet_spinner, 0, -1)
+                end,
+            })
+        end,
+    },
+}
